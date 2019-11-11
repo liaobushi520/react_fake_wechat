@@ -1,0 +1,174 @@
+.App {
+  text-align: center;
+  background-image: url("http://cdn.duitang.com/uploads/item/201603/04/20160304174148_hASJN.jpeg");
+  min-height: 100vh;
+  /*vh 视口高度*/
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+.Text-Message {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Chat-Control-Panel {
+  /**固定在浏览器底部*/
+  /* position : fixed; */
+  /* bottom: 0; */
+
+
+  width: 100%;
+  flex-grow: 1;
+  /**设置顶部分割线*/
+  border-top-color: #bdbdbd;
+  border-top-width: 1px;
+  border-top-style: solid
+}
+
+.Control-Panel-Header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.Send-Button {
+  background-color: #09d3ac;
+  color: #09d3ac;
+  font-size: 80px;
+}
+
+.avatar {
+  margin: 10;
+}
+
+.bigAvatar {
+  margin: 10;
+  width: 60;
+  height: 60;
+}
+
+.IconTextContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.TextMessageBox {
+  border-radius: 10px;
+  background-color: #09d3ac;
+  /* width: 50px; */
+  overflow: hidden;
+  max-width: 400px;
+  word-break: break-all;
+  word-wrap: break-word;
+  text-align: left;
+  padding: 5px;
+  box-shadow: 1px 1px #99bdbdbd;
+}
+
+
+.Chat-List {
+  list-style-type: none;
+  height: 600px;
+
+}
+
+.Profile {
+  text-align: center;
+  background-color: rgb(26, 22, 19);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 10px 10px;
+  color: aliceblue;
+}
+
+.Search-Box {
+  display: flex;
+  flex-direction: row;
+  background-color: #383434;
+}
+
+.Seach-Box-Input{
+  outline: none;
+  background: aqua;;
+  border: none;
+  outline: medium;
+}
+
+
+
+
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.Contact-list {
+
+  color: aliceblue;
+  flex-basis: 400px;
+}
+
+.Chat-Window {
+  flex: 1;
+  background-color: azure;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.Contact-Window {
+
+
+  flex-basis: 500px;
+
+  height: 100%;
+
+  background-color: aquamarine;
+  ;
+
+}
+
+
+
+.Container {
+
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  width: 900px;
+  height: 800px;
+  background-color: brown;
+
+  /****浏览器居中****/
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+  margin: auto;
+
+}

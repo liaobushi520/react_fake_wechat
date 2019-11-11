@@ -1,0 +1,90 @@
+.App {
+  text-align: center;
+  height: 100%;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+.Text-Message{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Control-Panel{
+  /**固定在浏览器底部*/
+  position : fixed;
+  width: 100%;
+  bottom: 0;
+}
+
+.Control-Panel-Header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.Send-Button{
+  background-color: #09d3ac;
+  color: #09d3ac;
+  font-size: 80px;
+}
+
+.avatar {
+  margin: 10;
+}
+.bigAvatar {
+  margin: 10;
+  width : 60;
+  height: 60;
+}
+.IconTextContainer{
+   display:flex;
+   flex-direction: column;
+   align-items: center;
+}
+
+.TextMessageBox{
+  border-radius: 20px;
+  background-color: #09d3ac;
+  /* width: 50px; */
+  overflow: hidden;
+  max-width: 50px;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+
+.Row{
+ display: flex;
+ flex-direction: row;
+ justify-content: space-between;
+}
+
+
+
+
+
+
+
+ 
+
+

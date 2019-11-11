@@ -1,0 +1,234 @@
+.App {
+  text-align: center;
+  background-image: url("http://img2.imgtn.bdimg.com/it/u=1781597617,593970871&fm=26&gp=0.jpg");
+  min-height: 100vh;
+  /*vh 视口高度*/
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #09d3ac;
+}
+
+.Text-Message {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Chat-Control-Panel {
+  /**固定在浏览器底部*/
+  /* position : fixed; */
+  /* bottom: 0; */
+
+
+  width: 100%;
+  flex-grow: 1;
+  /**设置顶部分割线*/
+  border-top-color: #bdbdbd;
+  border-top-width: 1px;
+  border-top-style: solid
+}
+
+.Control-Panel-Header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.Send-Button {
+  background-color: #09d3ac;
+  color: #09d3ac;
+  font-size: 80px;
+}
+
+.avatar {
+  margin: 10;
+}
+
+.bigAvatar {
+  margin: 10;
+  width: 60;
+  height: 60;
+}
+
+.IconTextContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.TextMessageBox {
+  border-radius: 10px;
+  background-color: #09d3ac;
+  /* width: 50px; */
+  overflow: hidden;
+  max-width: 400px;
+  word-break: break-all;
+  word-wrap: break-word;
+  text-align: left;
+  padding: 5px;
+  box-shadow: 1px 1px #99bdbdbd;
+}
+
+
+.Chat-List {
+  list-style-type: none;
+  height: 600px;
+
+}
+
+.Profile {
+  text-align: center;
+  background-color: rgb(26, 22, 19);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 10px 10px;
+  color: aliceblue;
+}
+
+.Search-Box {
+  display: flex;
+  flex-direction: row;
+  background-color: #383434;
+  padding: 10px 10px 10px;
+}
+
+.Search-Box-Input{
+  /**去掉输入框边框*/
+  outline: none;
+  background: transparent;
+  border: none;
+  color: azure;
+
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.Contact-list {
+  color: aliceblue;
+  flex: 1;
+  background-color: darkblue;
+   
+}
+
+.Contact-item{
+   display: flex;
+   flex-direction: row;
+   align-content: center;
+   align-items: center;/**cross axis*/
+   padding: 8px;
+   background-color: crimson;
+   align-items: stretch;
+}
+
+
+.Contact-item-2{
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    flex-grow:1;
+}
+
+.Contact-item-3{
+  display: flex;
+  flex-direction: row;
+   
+}
+
+.Contact-item-time{
+   font-size: 10px;
+   color: cornsilk;
+}
+
+.Contact-item-msg{
+   font-size: 12px;
+   text-align: left;
+}
+
+.Contact-item-img{
+   width: 200px;
+   height: 200px;
+}
+
+.Contact-item-name{
+  font-size: 10px;
+  flex: 1;
+  text-align: left;
+  
+}
+
+
+
+
+.Chat-Window {
+  flex: 1;
+  background-color:#d4dada;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+.No-chat{
+   text-align: center;
+   background-color:#d4dada;
+   flex-basis: 500px;
+   height: 100%;
+   display: flex; 
+   justify-content: center; 
+   align-items: center; 
+
+}
+
+.Contact-Window {
+
+
+  flex-basis: 500px;
+
+  height: 100%;
+
+  background-color: black;
+
+}
+
+
+
+.Container {
+
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  width: 900px;
+  height: 800px;
+  
+
+  /****浏览器居中****/
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+  margin: auto;
+
+}
