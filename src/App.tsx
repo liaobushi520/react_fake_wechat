@@ -6,9 +6,12 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { createStore, Action, Dispatch, combineReducers, applyMiddleware, MiddlewareAPI } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { Avatar } from '@material-ui/core';
+import { Avatar, Icon } from '@material-ui/core';
 import { ChangeEvent } from 'react';
 import { is } from '@babel/types';
+import { filterContact, FilterContactAction, Filter_Contact } from './actions';
+import emoji from './images/ic_emoji.svg'
+import { spacing } from '@material-ui/system';
 
 
 
@@ -33,9 +36,10 @@ class TextMessageView extends React.Component<TextMessageViewProps>{
   render() {
     return <li><div className="Text-Message">
       <Avatar alt="Remy Sharp" src={this.props.message.friend.avatar} className="avatar" />
-      <div className="TextMessageBox">{this.props.message.text}</div>
 
-    </div></li>
+      <div className="TextMessageBox">{this.props.message.text}</div>
+    </div>
+    </li>
   }
 }
 
@@ -94,6 +98,8 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
     this.sendImageMessage = this.sendImageMessage.bind(this)
     this.textChanged = this.textChanged.bind(this)
     this.sendFile = this.sendFile.bind(this)
+
+    this.keyDown = this.keyDown.bind(this)
   }
 
   switchInputType() {
@@ -120,6 +126,12 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
     this.setState({ text: e.target.value })
   }
 
+  keyDown(e: any) {
+    if (e.keyCode === 13) {
+      this.sendMessage()
+    }
+  }
+
   sendFile(ee: ChangeEvent) {
     let fileReader = new FileReader()
     let files = ee.currentTarget["files"]
@@ -132,28 +144,46 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
   }
 
 
+
+
+
+
   render() {
     return <div className="Chat-Control-Panel">
-      <div className="Control-Panel-Header">
-        <img src={logo} width="50" height="50" onClick={this.showOrHideMoreFunctionSection}></img>
-        <div>
-          <Visiblity visible={this.state.inputType} >  <input type="text" value={this.state.text} onChange={this.textChanged} />  </Visiblity>
-          <Visiblity visible={!this.state.inputType} >    <button>按住 说话</button>  </Visiblity>
-        </div>
-        <img src={logo} width="50" height="50" onClick={this.switchInputType}></img>
-        <Button variant="primary" onClick={this.sendMessage} className="Send-Button">发  送</Button>
+      <div className="SendBox-Bar">
+        <img src={emoji} width="24" height="24"></img>
+        <img src={emoji} width="24" height="24"></img>
+        <img src={emoji} width="24" height="24"></img>
+        <img src={emoji} width="24" height="24"></img>
       </div>
+      <textarea className="Control-Panel-Input" value={this.state.text} onChange={this.textChanged} onKeyDown={this.keyDown} />
 
-      <Visiblity visible={this.state.showMoreFunction}>
-        <div className="Row">
-          <IconText text="拍摄" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-          <IconText text="相册" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-          <IconText text="文件" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-          <input type="file" id="files" onChange={this.sendFile} />
-        </div>
-      </Visiblity>
     </div>
+
   }
+
+  // render() {
+  //   return <div className="Chat-Control-Panel">
+  //     <div className="Control-Panel-Header">
+  //       <img src={logo} width="50" height="50" onClick={this.showOrHideMoreFunctionSection}></img>
+  //       <div>
+  //         <Visiblity visible={this.state.inputType} >  <input type="text" value={this.state.text} onChange={this.textChanged} />  </Visiblity>
+  //         <Visiblity visible={!this.state.inputType} >    <button>按住 说话</button>  </Visiblity>
+  //       </div>
+  //       <img src={logo} width="50" height="50" onClick={this.switchInputType}></img>
+  //       <Button variant="primary" onClick={this.sendMessage} className="Send-Button">发  送</Button>
+  //     </div>
+
+  //     <Visiblity visible={this.state.showMoreFunction}>
+  //       <div className="Row">
+  //         <IconText text="拍摄" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
+  //         <IconText text="相册" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
+  //         <IconText text="文件" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
+  //         <input type="file" id="files" onChange={this.sendFile} />
+  //       </div>
+  //     </Visiblity>
+  //   </div>
+  // }
 }
 
 const controlPanelMapDispatchToProps = (dispatch: Dispatch) => ({
@@ -262,20 +292,17 @@ interface EnterChatAction extends Action {
   friend: Friend
 }
 
-interface FilterContact extends Action {
-  keyword: string
-}
 
 
 
 const defFriends: Friend[] = [
   { id: "000001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg", visible: true },
-  { id: "000002", name: "李贺", avatar: "http://b-ssl.duitang.com/uploads/item/201801/14/20180114115405_hfhrf.jpg", visible: true }
+  { id: "000002", name: "李贺jghvjhjfgjhgkghkghjkghkhljdzgfvdh", avatar: "http://b-ssl.duitang.com/uploads/item/201801/14/20180114115405_hfhrf.jpg", visible: true }
 ]
 
 
 
-function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap: new Map() }, action: SendMesageAction | EnterChatAction | FilterContact) {
+function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap: new Map() }, action: SendMesageAction | EnterChatAction | FilterContactAction) {
   switch (action.type) {
     case "sendMessage": {
       let newAction = (action as SendMesageAction)
@@ -290,7 +317,6 @@ function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap:
         newMap.set(key, v)
       ))
       let newState = Object.assign({ ...state }, { currentChat: [...msgList], messageMap: newMap })
-      console.log("after" + JSON.stringify(newState))
       return newState
     }
     case "sendImageMessage": {
@@ -313,9 +339,8 @@ function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap:
       return newState
     }
 
-    case "filterContact": {
-      console.log("filter contact")
-      let newAction = (action as FilterContact)
+    case Filter_Contact: {
+      let newAction = (action as FilterContactAction)
       state.friends.forEach((item) => {
         if (item.name.match(newAction.keyword) != null) {
           item.visible = true
@@ -323,7 +348,7 @@ function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap:
           item.visible = false
         }
       })
-      let newState = Object.assign({ ...state },{friends:[...state.friends]})
+      let newState = Object.assign({ ...state }, { friends: [...state.friends] })
       return newState
     }
 
@@ -350,7 +375,7 @@ interface ContactListViewProps {
 
 function contactItem(friend: Friend, messageMap: Map<Friend, Array<Message>>) {
   let msgList = messageMap.get(friend) || []
-  return <Visiblity visible={friend.visible}> <ContactItemV friend={friend} recentMsg={msgList[msgList.length - 1]} /> </Visiblity> 
+  return <Visiblity visible={friend.visible}> <ContactItemV friend={friend} recentMsg={msgList[msgList.length - 1]} /> </Visiblity>
 }
 
 class ContactListView extends React.Component<ContactListViewProps> {
@@ -359,8 +384,6 @@ class ContactListView extends React.Component<ContactListViewProps> {
   }
 
   render() {
-
-    console.log("contact list")
     return (
       <ul className="Contact-list">
         {
@@ -410,19 +433,19 @@ class ContactItemView extends React.Component<ContactItemViewProps> {
     } else if (this.props.recentMsg.msgType == "image") {
       recentMsgText = "图片消息"
     }
-    return  <div onClick={this.enterChat} className="Contact-item">
-        <Avatar src={this.props.friend.avatar} className="Contact-item-img"></Avatar>
-        <div className="Contact-item-2">
-          <div className="Contact-item-3">
-            <text className="Contact-item-name">{this.props.friend.name}</text>
-            <text className="Contact-item-time">10:10</text>
-          </div>
-
-          <text className="Contact-item-msg">{recentMsgText}</text>
-
+    return <div onClick={this.enterChat} className="Contact-item">
+      <Avatar src={this.props.friend.avatar} className="Contact-item-img"></Avatar>
+      <div className="Contact-item-2">
+        <div className="Contact-item-3">
+          <text className="Contact-item-name">{this.props.friend.name}</text>
+          <text className="Contact-item-time">10:10</text>
         </div>
+
+        <text className="Contact-item-msg">{recentMsgText}</text>
+
       </div>
-  ;
+    </div>
+      ;
   }
 
 }
@@ -435,16 +458,43 @@ const ContactItemV = connect(null, contactItemMapDispatchToProps)(ContactItemVie
 
 interface ChatWindowViewProps {
   hasChat: boolean
+  friend: Friend
 }
 
-class ChatWindowView extends React.Component<ChatWindowViewProps>{
+interface ChatWindowViewState {
+  showUserCard: boolean
+}
+
+
+
+class ChatWindowView extends React.Component<ChatWindowViewProps, ChatWindowViewState>{
   constructor(props) {
     super(props);
+    this.showUserCard = this.showUserCard.bind(this)
+    this.state = { "showUserCard": false }
+  }
+
+  showUserCard() {
+    this.setState({ "showUserCard": !this.state.showUserCard })
   }
 
   render() {
     if (this.props.hasChat) {
       return <div className="Chat-Window">
+        <div className="Chat-Header" onClick={this.showUserCard}>
+          {this.props.friend.name}
+          <Visiblity visible={this.state.showUserCard}>
+            <div className="User-Card">
+              <div className="User-Card-Title">
+                <div className="Avatar-Box">
+                  <img  src={this.props.friend.avatar}  className="Avatar"></img>
+                  <p className="Avatar-Box-Name">  {this.props.friend.name} </p>
+                </div>
+                </div>
+            </div>
+          </Visiblity>
+        </div>
+
         <DialoguePanelV >
         </DialoguePanelV>
         <ControlPanelV>
@@ -456,16 +506,12 @@ class ChatWindowView extends React.Component<ChatWindowViewProps>{
   }
 }
 
-const chatWindowMapStatToProps = (state: any) => ({
-  hasChat: state["chatReducer"].currentChatFriend != undefined || state["chatReducer"].currentChatFriend != null
+const chatWindowMapStateToProps = (state: any) => ({
+  hasChat: state["chatReducer"].currentChatFriend != undefined || state["chatReducer"].currentChatFriend != null,
+  friend: state["chatReducer"].currentChatFriend
 })
 
-const ChatWindowViewV = connect(chatWindowMapStatToProps)(ChatWindowView)
-
-
-
-
-
+const ChatWindowViewV = connect(chatWindowMapStateToProps)(ChatWindowView)
 
 
 const store = createStore(combineReducers({ chatReducer }), applyMiddleware(myMiddleware, myMiddleware2))
@@ -479,9 +525,8 @@ class App extends React.Component<{}, ChatDetailState> {
 
 
   keywordChanged(e: any) {
-    console.log(e.target.value)
-    store.dispatch({type:"filterContact",keyword:e.target.value})
-}
+    store.dispatch(filterContact(e.target.value))
+  }
 
   render() {
     //  store.subscribe(() => { console.log(JSON.stringify(store.getState())) })

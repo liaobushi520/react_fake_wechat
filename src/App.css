@@ -25,9 +25,10 @@
 }
 
 /**去掉列表前端空白，去掉小黑点***/
-ul,li{
-  padding:0; 
-  margin:0;
+ul,
+li {
+  padding: 0;
+  margin: 0;
   list-style-type: none;
 }
 
@@ -48,7 +49,11 @@ ul,li{
   /**设置顶部分割线*/
   border-top-color: #bdbdbd;
   border-top-width: 1px;
-  border-top-style: solid
+  border-top-style: solid;
+
+  display: flex;
+  flex-direction: column;
+
 }
 
 .Control-Panel-Header {
@@ -58,6 +63,26 @@ ul,li{
   justify-content: center;
 }
 
+.Control-Panel-Input {
+  align-content: stretch;
+  border: none;
+  flex: 1;
+  text-align: start;
+
+  overflow: hidden;
+  word-break: break-all;
+  word-wrap: break-word;
+
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #9ecaed;
+  border: none;
+}
+
+
+
 .Send-Button {
   background-color: #09d3ac;
   color: #09d3ac;
@@ -66,6 +91,12 @@ ul,li{
 
 .avatar {
   margin: 10;
+}
+
+.Avatar{
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
 }
 
 .bigAvatar {
@@ -95,7 +126,7 @@ ul,li{
 
 
 .Chat-List {
-   height: 600px;
+  height: 600px;
 }
 
 .Profile {
@@ -115,7 +146,7 @@ ul,li{
   padding: 10px 10px 10px;
 }
 
-.Search-Box-Input{
+.Search-Box-Input {
   /**去掉输入框边框*/
   outline: none;
   background: transparent;
@@ -136,87 +167,143 @@ ul,li{
   list-style-type: none;
 }
 
-.Contact-item{
-   display: flex;
-   flex-direction: row;
-   align-content: center;
-   align-items: center;/**cross axis*/
-   padding: 8px;
-}
-
-.Test{
-  background-color: darkcyan;
-
-}
-
-
-.Contact-item-2{
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
-    flex-grow:1;
-}
-
-.Contact-item-3{
+.Contact-item {
   display: flex;
   flex-direction: row;
-   
+  align-content: center;
+  align-items: center;
+  /**cross axis*/
+  padding: 8px;
+
+  border-bottom:  0.5px  solid #979c9c;
 }
 
-.Contact-item-time{
-   font-size: 10px;
-   color: cornsilk;
+
+.Contact-item-2 {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  flex-grow: 1;
 }
 
-.Contact-item-msg{
-   font-size: 12px;
-   text-align: left;
+.Contact-item-3 {
+  display: flex;
+  flex-direction: row;
+
 }
 
-.Contact-item-img{
-   width: 200px;
-   height: 200px;
+.Contact-item-time {
+  font-size: 10px;
+  color: cornsilk;
 }
 
-.Contact-item-name{
+.Contact-item-msg {
+  font-size: 12px;
+  text-align: left;
+
+  /**文本单行显示***/
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+.Contact-item-img {
+  width: 200px;
+  height: 200px;
+}
+
+.Contact-item-name {
   font-size: 10px;
   flex: 1;
   text-align: left;
-  
+
 }
 
 
 
 
 .Chat-Window {
-  flex: 1;
-  background-color:#d4dada;
+
+  background-color: #d4dada;
   display: flex;
   flex-direction: column;
   height: 100%;
+  flex-basis: 500px;
+
+}
+
+.SendBox-Bar {
+  display: flex;
+  flex-direction: row;
+  justify-items: start;
+  padding: 8px;
+}
+
+.Chat-Header{
+  padding: 12px;
+  position: relative;
+ 
+}
+
+.User-Card{
+  position: absolute;
+  z-index: 100000;
+  width: 240px;
+  left:50%;
+  right: auto;
+   
+   
+  background-color: aqua;
+  border-radius: 2px;
+  box-shadow:2px 2px rgba(0,0,0,.2);
+  
+}
+
+.User-Card-Title{
+  background: url("https://ss1.baidu.com/-4o3dSag_xI4khGko9WTAnF6hhy/image/h%3D300/sign=3d9fc10fa3014c08063b2ea53a7a025b/359b033b5bb5c9eac1754f45df39b6003bf3b396.jpg")  no-repeat;
+  text-align: center;
+  cursor: pointer;
+}
+
+.Avatar-Box{
+  display: inline-block;
+  cursor: pointer;
+  margin-top: 22px;
+ }
+
+
+.Avatar-Box-Name{
+    cursor: pointer;
+    padding: 8px 8px 0;
+    color: #fff;
+    white-space: nowrap;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    -webkit-box-orient: vertical;
+    max-width: 200px;
+
 }
 
 
-.No-chat{
-   text-align: center;
-   background-color:#d4dada;
-   flex-basis: 500px;
-   height: 100%;
-   display: flex; 
-   justify-content: center; 
-   align-items: center; 
+.No-chat {
+  text-align: center;
+  background-color: #d4dada;
+  flex-basis: 500px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
 }
 
 .Contact-Window {
-
-
-  flex-basis: 500px;
-
   height: 100%;
-
   background-color: black;
-
+  max-width: 400px;
+  width: 400px;
 }
 
 
@@ -228,7 +315,7 @@ ul,li{
   flex-direction: row;
   width: 900px;
   height: 800px;
-  
+
 
   /****浏览器居中****/
   position: fixed;
