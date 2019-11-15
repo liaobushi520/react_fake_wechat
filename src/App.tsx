@@ -4,14 +4,79 @@ import './App.css';
 import * as React from 'react';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { createStore, Action, Dispatch, combineReducers, applyMiddleware, MiddlewareAPI } from 'redux';
+import { createStore, Action, Dispatch, combineReducers, applyMiddleware, MiddlewareAPI, AnyAction } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { Avatar, Icon } from '@material-ui/core';
-import { ChangeEvent } from 'react';
+import { Avatar, Icon, CircularProgress } from '@material-ui/core';
+import { ChangeEvent, RefObject } from 'react';
 import { is } from '@babel/types';
 import { filterContact, FilterContactAction, Filter_Contact } from './actions';
 import emoji from './images/ic_emoji.svg'
+import photo from "./images/ic_photo.svg"
 import { spacing } from '@material-ui/system';
+import thunk from 'redux-thunk';
+
+
+
+var db
+let request = window.indexedDB.open("wechat", 3)
+request.onsuccess = (event) => {
+  db = request.result;
+  console.log("数据库打开成功")
+
+  ///写入默认联系人数据
+  let addFriendRequest = db.transaction(['friend'], 'readwrite')
+    .objectStore('friend')
+    .add([{ id: "10001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg" } ,
+  { id: "10002", name: "梁朝伟", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg" } 
+])
+    
+
+  addFriendRequest.onsuccess = (event) => {
+    console.log('写入联系人成功');
+  }
+
+  addFriendRequest.onerror = (event) => {
+    console.log('写入联系人失败');
+  }
+
+  var objectStore = db.transaction('friend').objectStore('friend');
+  objectStore.openCursor().onsuccess = function (event) {
+    var cursor = event.target.result;
+
+    if (cursor) {
+      console.log('Id: ' + cursor.key);
+      console.log('Name: ' + cursor.value.name);
+      console.log('Name: ' + cursor.value.avatar);
+      cursor.continue();
+    } else {
+      console.log('没有更多数据了！');
+    }
+  };
+
+
+
+}
+
+request.onupgradeneeded = (e) => {
+  console.log("数据库升级")
+  db = request.result;
+  var objectStore;
+  //创建联系人表
+  if (!db.objectStoreNames.contains('friend')) {
+    objectStore = db.createObjectStore('friend', { keyPath: 'id' });
+    objectStore.createIndex('name', 'name', { unique: false });
+    objectStore.createIndex('avatar', 'avatar', { unique: false });
+  }
+  //创建消息表
+  if (!db.objectStoreNames.contains('message')) {
+    objectStore = db.createObjectStore('message', { keyPath: 'id' });
+    objectStore.createIndex('msgType', 'msgType', { unique: false });
+    objectStore.createIndex('timeStamp', 'timeStamp', { unique: false });
+    objectStore.createIndex('friendId', 'friendId', { unique: false });
+    objectStore.createIndex('content', 'content', { unique: false });
+  }
+}
+
 
 
 
@@ -32,12 +97,37 @@ interface ImageMessageViewProps {
   message: ImageMessage
 }
 
+const MsgStatus: React.SFC<any> = (props: any) => {
+  switch (props.status) {
+    case "sending": {
+      return <CircularProgress size={18} />
+    }
+    case "success": {
+      return <text>已发送</text>
+    }
+
+    case "error": {
+      return <text>发送失败</text>
+    }
+
+    default: {
+      return <div></div>
+    }
+
+
+  }
+}
+
+
+
 class TextMessageView extends React.Component<TextMessageViewProps>{
   render() {
+
+
     return <li><div className="Text-Message">
       <Avatar alt="Remy Sharp" src={this.props.message.friend.avatar} className="avatar" />
-
       <div className="TextMessageBox">{this.props.message.text}</div>
+      <MsgStatus status={this.props.message.status} ></MsgStatus>
     </div>
     </li>
   }
@@ -52,7 +142,7 @@ class ImageMessageView extends React.Component<ImageMessageViewProps> {
   render() {
     return <li><div className="Text-Message">
       <Avatar alt="Remy Sharp" src={this.props.message.friend.avatar} className="avatar" />
-      <img src={this.props.message.image} width="300" height="400" ></img>
+      <img src={this.props.message.image} style={{ marginLeft: "10px", width: 300, height: "400px", borderRadius: "8px" }} ></img>
     </div></li>
   }
 }
@@ -89,6 +179,10 @@ interface ControlPanelProps {
 
 class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState> {
 
+
+  //引用DOM组件
+  inputRef = React.createRef<HTMLInputElement>();
+
   constructor(props: Readonly<ControlPanelProps>) {
     super(props)
     this.state = { showMoreFunction: true, inputType: false, text: "" }
@@ -100,6 +194,7 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
     this.sendFile = this.sendFile.bind(this)
 
     this.keyDown = this.keyDown.bind(this)
+    this.chooseImage = this.chooseImage.bind(this)
   }
 
   switchInputType() {
@@ -143,54 +238,78 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
     }
   }
 
+  chooseImage() {
+
+    if (this.inputRef.current != null && this.inputRef.current != undefined) {
+      this.inputRef.current.click()
+    }
+
+  }
+
 
 
 
 
 
   render() {
+
     return <div className="Chat-Control-Panel">
       <div className="SendBox-Bar">
-        <img src={emoji} width="24" height="24"></img>
-        <img src={emoji} width="24" height="24"></img>
-        <img src={emoji} width="24" height="24"></img>
-        <img src={emoji} width="24" height="24"></img>
+        <img src={emoji} className="SendBox-Icon"></img>
+        <img src={photo} onClick={this.chooseImage} className="SendBox-Icon"></img>
+        <img src={emoji} className="SendBox-Icon"></img>
+        <img src={emoji} className="SendBox-Icon"></img>
+        <div id="hidden_input">
+          <input ref={this.inputRef} type="file" id="files" onChange={this.sendFile} />
+        </div>
       </div>
-      <textarea className="Control-Panel-Input" value={this.state.text} onChange={this.textChanged} onKeyDown={this.keyDown} />
+      {/****textarea光标在左上角**/}
+      <textarea className="Control-Panel-Input" value={this.state.text} onChange={this.textChanged} onKeyDown={this.keyDown}></textarea>
 
     </div>
 
   }
 
-  // render() {
-  //   return <div className="Chat-Control-Panel">
-  //     <div className="Control-Panel-Header">
-  //       <img src={logo} width="50" height="50" onClick={this.showOrHideMoreFunctionSection}></img>
-  //       <div>
-  //         <Visiblity visible={this.state.inputType} >  <input type="text" value={this.state.text} onChange={this.textChanged} />  </Visiblity>
-  //         <Visiblity visible={!this.state.inputType} >    <button>按住 说话</button>  </Visiblity>
-  //       </div>
-  //       <img src={logo} width="50" height="50" onClick={this.switchInputType}></img>
-  //       <Button variant="primary" onClick={this.sendMessage} className="Send-Button">发  送</Button>
-  //     </div>
-
-  //     <Visiblity visible={this.state.showMoreFunction}>
-  //       <div className="Row">
-  //         <IconText text="拍摄" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-  //         <IconText text="相册" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-  //         <IconText text="文件" icon="http://pic4.zhimg.com/50/v2-1adce42102e226eea2e96d19c116598c_hd.jpg"></IconText>
-  //         <input type="file" id="files" onChange={this.sendFile} />
-  //       </div>
-  //     </Visiblity>
-  //   </div>
-  // }
 }
 
-const controlPanelMapDispatchToProps = (dispatch: Dispatch) => ({
-  "sendMessage": (text: string, friend: Friend) => dispatch({ type: "sendMessage", message: { msgType: "text", text: text, timestamp: 100001, friend: friend } })
+const controlPanelMapDispatchToProps = (dispatch: any) => ({
+  "sendMessage": (text: string, friend: Friend) => dispatch(sendMessage({ msgType: "text", text: text, timestamp: 100001, friend: friend }))
   , "sendImageMessage": (image: string, friend: Friend) => dispatch({ type: "sendImageMessage", message: { msgType: "image", image: image, timestamp: 1000033, friend: friend } })
 
 })
+
+
+
+
+function sendMessage(msg: TextMessage) {
+  return (dispatch: Dispatch) => {
+
+    msg.status = "sending"
+    dispatch({ type: "sendMessage", message: msg })
+
+    let addRequest = db.transaction(['message'], 'readwrite')
+      .objectStore('message')
+      .add({ id: msg.friend.id, name: msg.friend.name, avatar: msg.friend.avatar });
+
+    addRequest.onsuccess = (event) => {
+      console.log('数据写入成功');
+      msg.status = "success"
+      dispatch({ type: "sendMessage", message: msg })
+    }
+
+    addRequest.onerror = (event) => {
+      console.log('数据写入失败');
+      msg.status = "error"
+      dispatch({ type: "sendMessage", message: msg })
+    }
+
+
+
+
+  }
+}
+
+
 
 const controlPanelMapStateToProps = (state: any) => ({
   friend: state["chatReducer"].currentChatFriend
@@ -227,25 +346,36 @@ interface DialoguePanelProps {
 
 function renderMessage(message: Message) {
   if (message.msgType == "text") {
-    return <TextMessageView message={message as TextMessage} />
+    return <div className="Message-Wrapper"> <TextMessageView message={message as TextMessage} /> </div>
   } else if (message.msgType == "image") {
-    return <ImageMessageView message={message as ImageMessage} />
+    return <div className="Message-Wrapper"> <ImageMessageView message={message as ImageMessage} /></div>
   }
 }
 
 class DialoguePanel extends React.Component<DialoguePanelProps>{
 
+  ulRef = React.createRef<HTMLUListElement>()
+
   constructor(props: Readonly<DialoguePanelProps>) {
     super(props)
   }
+
   render() {
-    return <ul className="Chat-List">
+
+    return <ul ref={this.ulRef} className="Chat-List">
       {
         this.props.msgList.map((s: Message) => (
           renderMessage(s)
         ))
       }
     </ul>
+  }
+  componentDidUpdate() {
+    if (this.ulRef.current != null) {
+      //发送消息之后，滚到底部
+      this.ulRef.current.scrollTop = 10000
+    }
+
   }
 
 }
@@ -265,6 +395,7 @@ interface Message {
 
 interface ChatMessage extends Message {
   friend: Friend
+  status?: string //success error sending
 }
 
 interface TextMessage extends ChatMessage {
@@ -281,6 +412,7 @@ interface ChatDetailState {
   messageMap: Map<Friend, Array<Message>>
   currentChatFriend?: Friend
   currentChat?: Array<Message>
+
 }
 
 
@@ -299,6 +431,9 @@ const defFriends: Friend[] = [
   { id: "000001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg", visible: true },
   { id: "000002", name: "李贺jghvjhjfgjhgkghkghjkghkhljdzgfvdh", avatar: "http://b-ssl.duitang.com/uploads/item/201801/14/20180114115405_hfhrf.jpg", visible: true }
 ]
+
+
+
 
 
 
@@ -328,7 +463,6 @@ function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap:
       let msgList = state.messageMap.get(imageMsg.friend) || []
       msgList.push(newAction.message)
       let newState = Object.assign({ ...state }, { currentChat: msgList })
-      console.log("fFFFF" + JSON.stringify(newState))
       return newState
     }
     case "enterChat": {
@@ -381,6 +515,9 @@ function contactItem(friend: Friend, messageMap: Map<Friend, Array<Message>>) {
 class ContactListView extends React.Component<ContactListViewProps> {
   constructor(props) {
     super(props);
+
+
+
   }
 
   render() {
@@ -487,10 +624,10 @@ class ChatWindowView extends React.Component<ChatWindowViewProps, ChatWindowView
             <div className="User-Card">
               <div className="User-Card-Title">
                 <div className="Avatar-Box">
-                  <img  src={this.props.friend.avatar}  className="Avatar"></img>
+                  <img src={this.props.friend.avatar} className="Avatar"></img>
                   <p className="Avatar-Box-Name">  {this.props.friend.name} </p>
                 </div>
-                </div>
+              </div>
             </div>
           </Visiblity>
         </div>
@@ -514,25 +651,33 @@ const chatWindowMapStateToProps = (state: any) => ({
 const ChatWindowViewV = connect(chatWindowMapStateToProps)(ChatWindowView)
 
 
-const store = createStore(combineReducers({ chatReducer }), applyMiddleware(myMiddleware, myMiddleware2))
+const store = createStore(combineReducers({ chatReducer }), applyMiddleware(thunk, myMiddleware, myMiddleware2))
 
 class App extends React.Component<{}, ChatDetailState> {
 
   constructor(props: Readonly<{}>) {
     super(props)
     this.keywordChanged = this.keywordChanged.bind(this)
+    this.clickOuterSection = this.clickOuterSection.bind(this)
   }
+
+
 
 
   keywordChanged(e: any) {
     store.dispatch(filterContact(e.target.value))
   }
 
+  clickOuterSection(e: any) {
+    console.log("点击外部区域")
+
+  }
+
   render() {
     //  store.subscribe(() => { console.log(JSON.stringify(store.getState())) })
     return (
       <Provider store={store}>
-        <div className="App">
+        <div className="App" onClick={this.clickOuterSection}>
           <div className="Container">
             <div className="Contact-Window">
               <div className="Profile">
