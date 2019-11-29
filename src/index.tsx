@@ -5,12 +5,14 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import * as React from 'react';
 import PersistentDrawerLeft from './PersistentDrawerLeft';
+import BannnerDemo from './bannerdemo';
+ 
  
  
  
  
 
-ReactDOM.render(<App/> , document.getElementById('root'));
+ReactDOM.render(<BannnerDemo/> , document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -7,11 +7,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { createStore, Action, Dispatch, combineReducers, applyMiddleware, MiddlewareAPI, AnyAction } from 'redux';
 import { Provider, connect } from 'react-redux';
 import { Avatar, Icon, CircularProgress } from '@material-ui/core';
-import { ChangeEvent, RefObject } from 'react';
+import { ChangeEvent, RefObject, useState } from 'react';
 import { is } from '@babel/types';
 import { filterContact, FilterContactAction, Filter_Contact } from './actions';
 import emoji from './images/ic_emoji.svg'
 import photo from "./images/ic_photo.svg"
+import bigv from "./images/bigv.png"
+
 import { spacing } from '@material-ui/system';
 import thunk from 'redux-thunk';
 
@@ -24,14 +26,9 @@ request.onsuccess = (event) => {
   console.log("数据库打开成功")
 
   ///写入默认联系人数据
-  let addFriendRequest = db.transaction(['friend'], 'readwrite')
-    .objectStore('friend')
-    .add([{ id: "10001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg" } ,
-  { id: "10002", name: "梁朝伟", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg" } 
-])
-    
-
-  addFriendRequest.onsuccess = (event) => {
+   let objectStore = db.transaction(['friend'], 'readwrite').objectStore('friend');
+   let addFriendRequest= objectStore.add({ id: "10001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg" })
+   addFriendRequest.onsuccess = (event) => {
     console.log('写入联系人成功');
   }
 
@@ -39,8 +36,8 @@ request.onsuccess = (event) => {
     console.log('写入联系人失败');
   }
 
-  var objectStore = db.transaction('friend').objectStore('friend');
-  objectStore.openCursor().onsuccess = function (event) {
+  var objectStore2 = db.transaction('friend').objectStore('friend');
+  objectStore2.openCursor().onsuccess = function (event) {
     var cursor = event.target.result;
 
     if (cursor) {
@@ -52,9 +49,6 @@ request.onsuccess = (event) => {
       console.log('没有更多数据了！');
     }
   };
-
-
-
 }
 
 request.onupgradeneeded = (e) => {
@@ -273,8 +267,8 @@ class ControlPanel extends React.Component<ControlPanelProps, ControlPanelState>
 }
 
 const controlPanelMapDispatchToProps = (dispatch: any) => ({
-  "sendMessage": (text: string, friend: Friend) => dispatch(sendMessage({ msgType: "text", text: text, timestamp: 100001, friend: friend }))
-  , "sendImageMessage": (image: string, friend: Friend) => dispatch({ type: "sendImageMessage", message: { msgType: "image", image: image, timestamp: 1000033, friend: friend } })
+  "sendMessage": (text: string, friend: Friend) => dispatch(sendMessage({ msgType: "text", text: text, timestamp: new Date().getMilliseconds(), friend: friend }))
+  , "sendImageMessage": (image: string, friend: Friend) => dispatch({ type: "sendImageMessage", message: { msgType: "image", image: image, timestamp: new Date().getMilliseconds(), friend: friend } })
 
 })
 
@@ -289,7 +283,7 @@ function sendMessage(msg: TextMessage) {
 
     let addRequest = db.transaction(['message'], 'readwrite')
       .objectStore('message')
-      .add({ id: msg.friend.id, name: msg.friend.name, avatar: msg.friend.avatar });
+      .add({id:('${msg.friend.friendId}msg.timeStamp'), friendId: msg.friend.id, content: msg.text, timeStamp: msg.timestamp });
 
     addRequest.onsuccess = (event) => {
       console.log('数据写入成功');
@@ -429,12 +423,8 @@ interface EnterChatAction extends Action {
 
 const defFriends: Friend[] = [
   { id: "000001", name: "王元安", avatar: "http://img5.imgtn.bdimg.com/it/u=2630241800,682426215&fm=26&gp=0.jpg", visible: true },
-  { id: "000002", name: "李贺jghvjhjfgjhgkghkghjkghkhljdzgfvdh", avatar: "http://b-ssl.duitang.com/uploads/item/201801/14/20180114115405_hfhrf.jpg", visible: true }
+  { id: "000002", name: "李贺", avatar: "http://b-ssl.duitang.com/uploads/item/201801/14/20180114115405_hfhrf.jpg", visible: true }
 ]
-
-
-
-
 
 
 function chatReducer(state: ChatDetailState = { friends: defFriends, messageMap: new Map() }, action: SendMesageAction | EnterChatAction | FilterContactAction) {
@@ -571,15 +561,28 @@ class ContactItemView extends React.Component<ContactItemViewProps> {
       recentMsgText = "图片消息"
     }
     return <div onClick={this.enterChat} className="Contact-item">
-      <Avatar src={this.props.friend.avatar} className="Contact-item-img"></Avatar>
+       <div className="Contact-Avatar-Box">
+        <Avatar src={this.props.friend.avatar} className="Contact-item-img"
+        ></Avatar>
+
+       <i className="Subscript-Icon">
+         <img src={bigv} width="100%" height="100%"></img>
+      </i>
+      </div>
+
+       
+     
       <div className="Contact-item-2">
         <div className="Contact-item-3">
           <text className="Contact-item-name">{this.props.friend.name}</text>
           <text className="Contact-item-time">10:10</text>
         </div>
-
-        <text className="Contact-item-msg">{recentMsgText}</text>
-
+        <div className="Contact-item-3" style={{ alignItems:"center"}}>
+        <text className="Contact-item-msg"  >{recentMsgText}</text>
+        <div id="unread_msg">
+           11
+        </div>
+        </div>
       </div>
     </div>
       ;
@@ -616,6 +619,7 @@ class ChatWindowView extends React.Component<ChatWindowViewProps, ChatWindowView
   }
 
   render() {
+    React.useState
     if (this.props.hasChat) {
       return <div className="Chat-Window">
         <div className="Chat-Header" onClick={this.showUserCard}>
@@ -670,8 +674,7 @@ class App extends React.Component<{}, ChatDetailState> {
 
   clickOuterSection(e: any) {
     console.log("点击外部区域")
-
-  }
+ }
 
   render() {
     //  store.subscribe(() => { console.log(JSON.stringify(store.getState())) })
@@ -685,7 +688,7 @@ class App extends React.Component<{}, ChatDetailState> {
                 <text>廖布斯</text>
               </div>
               <div className="Search-Box">
-                <input type="text" className="Search-Box-Input" onChange={this.keywordChanged}></input>
+                <input type="text" className="Search-Box-Input" onChange={this.keywordChanged} placeholder="查找联系人或群"></input>
               </div>
               <ContactListV />
             </div>
